@@ -4,7 +4,7 @@ use reedline_repl_rs::Result as ReplResult;
 pub struct CFSPrompt;
 
 impl CFSPrompt {
-  pub async fn update_prompt(context: &mut CFSContext) -> ReplResult<Option<String>> {
+  pub async fn update_prompt(_context: &mut CFSContext) -> ReplResult<Option<String>> {
     // let pwd = context.pwd();
     let pwd = "/";
 
