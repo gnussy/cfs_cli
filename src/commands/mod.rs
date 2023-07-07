@@ -31,9 +31,7 @@ impl Commands {
 
   pub fn ls() -> Result<(Command, CFSCallback)> {
     Ok((
-      Command::new("ls")
-        .arg(Arg::new("path").default_value("."))
-        .about("List files in a directory in the CFS"),
+      Command::new("ls").about("List files in a directory in the CFS"),
       |args, context| Box::pin(ls::ls(args, context)),
     ))
   }
