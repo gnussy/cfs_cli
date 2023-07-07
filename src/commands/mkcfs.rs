@@ -6,7 +6,7 @@ use reedline_repl_rs::{clap::ArgMatches, Error, Result as ReplResult};
 
 use crate::context::CFSContext;
 
-pub async fn mkcfs(args: ArgMatches, _context: &mut CFSContext) -> ReplResult<Option<String>> {
+pub async fn mkcfs(args: ArgMatches, context: &mut CFSContext) -> ReplResult<Option<String>> {
   let (block_size, device) = show_input_prompt(
     args.get_one::<String>("block_size"),
     args.get_one::<String>("device"),
@@ -19,11 +19,9 @@ pub async fn mkcfs(args: ArgMatches, _context: &mut CFSContext) -> ReplResult<Op
     .open(&device)
     .map_err(|_| Error::UnknownCommand("Failed to open device".to_string()))?;
 
-  let mut cfs_partition = cfs::partition::CfsPartition::new(file, block_size as u64)
-    .map_err(|_| Error::UnknownCommand("Failed to create partition".to_string()))?;
-  cfs_partition
-    .setup_root_dir()
-    .map_err(|_| Error::UnknownCommand("Failed to setup root directory".to_string()))?;
+  context
+    .mkcfs(file, block_size.into())
+    .map_err(|err| Error::UnknownCommand(format!("Failed to create CFS partition: {err}")))?;
 
   Ok(Some(format!(
     "Created CFS partition with block size {} on device {}",

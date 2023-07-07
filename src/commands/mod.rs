@@ -50,7 +50,7 @@ impl Commands {
   pub fn put() -> Result<(Command, CFSCallback)> {
     Ok((
       Command::new("put")
-        .arg(Arg::new("path").default_value("."))
+        .arg(Arg::new("path"))
         .about("Put a file in the CFS from the host file system"),
       |args, context| Box::pin(put::put(args, context)),
     ))

@@ -1,4 +1,4 @@
-use reedline_repl_rs::{clap::ArgMatches, Result as ReplResult};
+use reedline_repl_rs::Result as ReplResult;
 use tabled::{
   settings::{object::Segment, Alignment, Modify, Style},
   Table, Tabled,
@@ -21,7 +21,7 @@ struct CFSReport {
 
 pub async fn info(context: &mut CFSContext) -> ReplResult<Option<String>> {
   let cfs = context
-    .get_cfs()
+    .cfs()
     .map_err(|err| reedline_repl_rs::Error::UnknownCommand(format!("Failed to get CFS: {err}")))?;
 
   let cfs = cfs.lock().await;
@@ -34,7 +34,7 @@ pub async fn info(context: &mut CFSContext) -> ReplResult<Option<String>> {
     data_block_offset,
   };
 
-  let mut table = Table::new(&[table]);
+  let mut table = Table::new([table]);
   table
     .with(Style::rounded())
     .with(Modify::new(Segment::all()).with(Alignment::left()));
