@@ -4,6 +4,7 @@ use reedline_repl_rs::{
   AsyncCallback, Error, Result,
 };
 
+pub mod cat;
 pub mod get;
 pub mod host_ls;
 pub mod info;
@@ -11,6 +12,8 @@ pub mod load;
 pub mod ls;
 pub mod mkcfs;
 pub mod put;
+pub mod rm;
+pub mod rmi;
 
 pub struct Commands;
 
@@ -26,6 +29,9 @@ impl Commands {
       Commands::mkcfs()?,
       Commands::load()?,
       Commands::info()?,
+      Commands::rm()?,
+      Commands::rmi()?,
+      Commands::cat()?,
     ])
   }
 
@@ -57,7 +63,7 @@ impl Commands {
   pub fn get() -> Result<(Command, CFSCallback)> {
     Ok((
       Command::new("get")
-        .arg(Arg::new("path").default_value("."))
+        .arg(Arg::new("path"))
         .about("Get a file from the CFS into the host file system"),
       |args, context| Box::pin(get::get(args, context)),
     ))
@@ -86,6 +92,33 @@ impl Commands {
     Ok((
       Command::new("info").about("Get information about the CFS"),
       |_args, context| Box::pin(info::info(context)),
+    ))
+  }
+
+  pub fn rm() -> Result<(Command, CFSCallback)> {
+    Ok((
+      Command::new("rm")
+        .arg(Arg::new("file"))
+        .about("Remove a file from the CFS through its name"),
+      |args, context| Box::pin(rm::rm(args, context)),
+    ))
+  }
+
+  pub fn rmi() -> Result<(Command, CFSCallback)> {
+    Ok((
+      Command::new("rmi")
+        .arg(Arg::new("inode"))
+        .about("Remove a file from the CFS through its inode"),
+      |args, context| Box::pin(rmi::rmi(args, context)),
+    ))
+  }
+
+  pub fn cat() -> Result<(Command, CFSCallback)> {
+    Ok((
+      Command::new("cat")
+        .arg(Arg::new("inode"))
+        .about("Print the contents of a file in the CFS"),
+      |args, context| Box::pin(cat::cat(args, context)),
     ))
   }
 }
