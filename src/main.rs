@@ -6,10 +6,10 @@ use reedline_repl_rs::{Repl, Result};
 // [ ] cp --from
 // [ ] cp --to
 // [ ] rm
-// [ ] mkcfs
+// [✅] mkcfs
 #[tokio::main]
 async fn main() -> Result<()> {
-  let mut repl = Repl::new(CFSContext)
+  let mut repl = Repl::new(CFSContext::default())
     .with_name("Complex File System")
     .with_version("0.1.0")
     .with_banner("Welcome to the Complex File System CLI")
@@ -21,5 +21,6 @@ async fn main() -> Result<()> {
     repl = repl.with_command_async(command, callback);
   }
 
+  cfs::init_library_logger();
   repl.run_async().await
 }

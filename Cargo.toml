@@ -19,3 +19,4 @@ owo-colors = "3.5"
 
 cfs = { version="0.1.0", path = "../cfs" }
 tokio = { version = "1", features = ["full"] }
+deku = "0.16.0"
