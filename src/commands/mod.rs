@@ -63,6 +63,7 @@ impl Commands {
   pub fn get() -> Result<(Command, CFSCallback)> {
     Ok((
       Command::new("get")
+        .arg(Arg::new("inode"))
         .arg(Arg::new("path"))
         .about("Get a file from the CFS into the host file system"),
       |args, context| Box::pin(get::get(args, context)),
