@@ -6,18 +6,20 @@ use reedline_repl_rs::{clap::ArgMatches, Error, Result as ReplResult};
 
 use crate::context::CFSContext;
 
-pub async fn put(args: ArgMatches, _context: &mut CFSContext) -> ReplResult<Option<String>> {
-  let _path = show_input_prompt(args.get_one::<String>("path"))
+pub async fn load(args: ArgMatches, context: &mut CFSContext) -> ReplResult<Option<String>> {
+  let image_path = show_input_prompt(args.get_one::<String>("image"))
     .map_err(|_| Error::UnknownCommand("Failed to get input".to_string()))?;
 
-  // let file = std::fs::OpenOptions::new()
-  //   .read(true)
-  //   .open(path)
-  //   .map_err(|_| Error::UnknownCommand("Failed to open file".to_string()))?;
+  let file = std::fs::OpenOptions::new()
+    .read(true)
+    .open(&image_path)
+    .map_err(|_| Error::UnknownCommand("Failed to open file".to_string()))?;
 
-  Err(reedline_repl_rs::Error::UnknownCommand(
-    "put not implemented yet".to_string(),
-  ))
+  context
+    .load_cfs(file)
+    .map_err(|err| Error::UnknownCommand(format!("{err} {image_path}")))?;
+
+  Ok(Some(format!("Loaded CFS image from {}", image_path)))
 }
 
 fn show_input_prompt(path: Option<&String>) -> Result<String, AbortReason> {

@@ -6,6 +6,8 @@ use reedline_repl_rs::{
 
 pub mod get;
 pub mod host_ls;
+pub mod info;
+pub mod load;
 pub mod ls;
 pub mod mkcfs;
 pub mod put;
@@ -22,6 +24,8 @@ impl Commands {
       Commands::put()?,
       Commands::get()?,
       Commands::mkcfs()?,
+      Commands::load()?,
+      Commands::info()?,
     ])
   }
 
@@ -68,6 +72,22 @@ impl Commands {
         .arg(arg!(-d --device <DEVICE> "Block size in bytes"))
         .about("Format a file as a CFS"),
       |args, context| Box::pin(mkcfs::mkcfs(args, context)),
+    ))
+  }
+
+  pub fn load() -> Result<(Command, CFSCallback)> {
+    Ok((
+      Command::new("load")
+        .arg(arg!(-i --image <IMAGE> "Path to the CFS image"))
+        .about("Load a CFS from a file"),
+      |args, context| Box::pin(load::load(args, context)),
+    ))
+  }
+
+  pub fn info() -> Result<(Command, CFSCallback)> {
+    Ok((
+      Command::new("info").about("Get information about the CFS"),
+      |_args, context| Box::pin(info::info(context)),
     ))
   }
 }

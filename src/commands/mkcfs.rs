@@ -2,7 +2,7 @@ use cli_prompts::{
   prompts::{AbortReason, Input},
   DisplayPrompt,
 };
-use reedline_repl_rs::{clap::ArgMatches, Result as ReplResult};
+use reedline_repl_rs::{clap::ArgMatches, Error, Result as ReplResult};
 
 use crate::context::CFSContext;
 
@@ -11,14 +11,24 @@ pub async fn mkcfs(args: ArgMatches, _context: &mut CFSContext) -> ReplResult<Op
     args.get_one::<String>("block_size"),
     args.get_one::<String>("device"),
   )
-  .map_err(|_| "Failed to get input".to_string())
-  .unwrap();
+  .map_err(|_| Error::UnknownCommand("Failed to get input".to_string()))?;
 
-  println!("block_size: {}, device: {}", block_size, device);
+  let file = std::fs::OpenOptions::new()
+    .read(true)
+    .write(true)
+    .open(&device)
+    .map_err(|_| Error::UnknownCommand("Failed to open device".to_string()))?;
 
-  Err(reedline_repl_rs::Error::UnknownCommand(
-    "mkcfs not fully implemented yet".to_string(),
-  ))
+  let mut cfs_partition = cfs::partition::CfsPartition::new(file, block_size as u64)
+    .map_err(|_| Error::UnknownCommand("Failed to create partition".to_string()))?;
+  cfs_partition
+    .setup_root_dir()
+    .map_err(|_| Error::UnknownCommand("Failed to setup root directory".to_string()))?;
+
+  Ok(Some(format!(
+    "Created CFS partition with block size {} on device {}",
+    block_size, device
+  )))
 }
 
 fn show_input_prompt(
